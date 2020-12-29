@@ -34,6 +34,6 @@ def downloadfile(ftp):
 
 
 if __name__ == "__main__":
-   ftp = ftpconnect("120.92.17.138", "game_update", "WB4kFRL2") 
+   ftp = ftpconnect("*.*.*.*", "game_update", "WB4kFRL2") 
    downloadfile(ftp) 
         
