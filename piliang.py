@@ -8,7 +8,15 @@ import select
 import thread
 import smtplib
 from email.mime.text import MIMEText
+from email.utils import formataddr
 from email.header import Header
+
+
+mailto_list=['*****@linekong.com']
+mail_host="smtp.163.com"  #设置服务器
+mail_user="********@163.com"   #用户名
+mail_pass="******"   #口令
+mail_name = "游戏服务端口报警"
 
  
 def getaddresslist(addr):
@@ -34,6 +42,25 @@ def getaddressport(addr):
         return scanport
     except (IOError, IndexError), e:
         return str(e)
+     
+def send_mail(context):
+    message = MIMEText (content, 'plain', 'utf-8')
+    message['From'] = mail_user
+    message['To'] = ','.join(mailto_list)
+    subject = '端口报警'
+    message['Subject'] = Header (subject, 'utf-8')
+    try:
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect(mail_host, 25)  # 25 为 SMTP 端口号
+        smtpObj.starttls()
+        smtpObj.login(mail_user, mail_pass)
+        smtpObj.sendmail(mail_user, mailto_list, message.as_string ())
+        return True
+    except Exception, e:
+        print str(e)
+        print 'error'
+        return False
+        pass
 
 def scan(ip_list, port):
     """
@@ -45,7 +72,7 @@ def scan(ip_list, port):
         sys.exit ("Function getaddresslist() return error message: %s" % ip_list)
     strtime = time.strftime ('%Y-%m-%d_%H:%M:%S', time.localtime ())
 
-    f = open ('/data/tujia/python/pythonscan.log', 'ab')
+    open ('/data/tujia/python/pythonscan.log', 'ab') as f:
     for addr in ip_list:
         for scanport in port:
             host = (addr,int(scanport))
@@ -57,24 +84,8 @@ def scan(ip_list, port):
                 # f.write("%s Host  %s:%s connection success. \n" % ( strtime,  host[0], host[1]))
             except Exception, e:
                 f.write ("%s Host %s:%s connection failure: %s. \n" % (strtime, host[0], host[1], e))
-                mail_host = "smtp.163.com"  # 设置服务器
-                mail_user = "*********@163.com"  # 用户名
-                mail_pass = "******"  # 口令
-                sender = '***********@163.com'
-                receivers = ['*****@linekong.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
-                messagelog = "%s Host  %s:%s connection failure \n" % (strtime, host[0], host[1])
-                message = MIMEText (messagelog, 'plain', 'utf-8')
-                message['From'] = "13718467661@163.com"
-                message['To'] = "tujia@linekong.com"
-                subject = '测试邮件'
-                message['Subject'] = Header (subject, 'utf-8')
-                smtpObj = smtplib.SMTP ()
-                smtpObj.connect (mail_host, 25)  # 25 为 SMTP 端口号
-                smtpObj.login (mail_user, mail_pass)
-                smtpObj.sendmail (sender, receivers, message.as_string ())
+                send_mail("%s Host  %s:%s connection failure \n" % (strtime, host[0], host[1]))
                
-    s.close()
-    f.close()
                   
 
 
