@@ -72,20 +72,20 @@ def scan(ip_list, port):
         sys.exit ("Function getaddresslist() return error message: %s" % ip_list)
     strtime = time.strftime ('%Y-%m-%d_%H:%M:%S', time.localtime ())
 
-    open ('/data/tujia/python/pythonscan.log', 'ab') as f:
-    for addr in ip_list:
-        for scanport in port:
-            host = (addr,int(scanport))
-            try:
-                s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout (5)
-                s.connect (host)
-                print ("%s Host  %s:%s connection success. \n" % (strtime, host[0], host[1]))
-                # f.write("%s Host  %s:%s connection success. \n" % ( strtime,  host[0], host[1]))
-            except Exception, e:
-                f.write ("%s Host %s:%s connection failure: %s. \n" % (strtime, host[0], host[1], e))
-                send_mail("%s Host  %s:%s connection failure \n" % (strtime, host[0], host[1]))
-               
+    whit open ('/data/tujia/python/pythonscan.log', 'ab') as f:
+        for addr in ip_list:
+            for scanport in port:
+                host = (addr,int(scanport))
+                try:
+                    s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout (5)
+                    s.connect (host)
+                    print ("%s Host  %s:%s connection success. \n" % (strtime, host[0], host[1]))
+                    # f.write("%s Host  %s:%s connection success. \n" % ( strtime,  host[0], host[1]))
+                except Exception, e:
+                    f.write ("%s Host %s:%s connection failure: %s. \n" % (strtime, host[0], host[1], e))
+                    send_mail("%s Host  %s:%s connection failure \n" % (strtime, host[0], host[1]))
+
                   
 
 
