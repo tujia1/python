@@ -15,8 +15,8 @@ def Fileconfig():
         config = yaml.full_load(f)
         return config
 
+
 def Urlexport(url):
-    ''' 利用requests模块返回http响应时间'''
     r = requests.get(url, timeout=1)
     time = r.elapsed.total_seconds()
     result_de = {"url": url, "time": time}
@@ -38,22 +38,23 @@ def Checkport():
     data = Fileconfig()
     result_list = []
     for i in data.keys():
-        iplist = data.get(i).get("host")
-        ports = data.get(i).get("port")
-        for ip in iplist:
-            for port in ports:
-                result_dic = Exploreport(i, ip, port)
-                result_list.append(result_dic)
+        if i != "http":
+            iplist = data.get(i).get("host")
+            ports = data.get(i).get("port")
+            for ip in iplist:
+                for port in ports:
+                    result_dic = Exploreport(i, ip, port)
+                    result_list.append(result_dic)
     return result_list
 
 def CheckUrl():
     sul = Fileconfig()
     result_list1 = []
     for y in sul.keys():
-        url1 = "".join(sul.get(y).get("url"))
-        print(url1)
-        result_dc = Urlexport(url1)
-        result_list1.append(result_dc)
+        if y == "http":
+            url1 = "".join(sul.get(y).get("url"))
+            result_dc = Urlexport(url1)
+            result_list1.append(result_dc)
     return result_list1
 
 @app.route("/metrics")
@@ -75,5 +76,4 @@ def ApiResponse():
         mesurl.labels(url).set(time)
     return Response(prometheus_client.generate_latest(REGISTRY), mimetype="text/plain")
 if __name__ == '__main__':
-    CheckUrl()
     app.run(host="127.0.0.1", port="5000", debug=True)
