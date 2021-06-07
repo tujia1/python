@@ -1,0 +1,13 @@
+sszj:
+  host:
+    - "x.x.x.x"
+  port:
+    - xxxx
+zhz
+  host:
+    - "x.x.x.x"
+  port:
+    - xxxx
+http:
+  url:
+    - "http://www.baidu.com"
