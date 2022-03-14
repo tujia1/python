@@ -12,6 +12,7 @@ from email.utils import formataddr
 from email.header import Header
 
 logpath = os.path.dirname(sys.argv[0])
+#######邮件配置#########
 mailto_list=['*****@linekong.com']
 mail_host="smtp.163.com"  #设置服务器
 mail_user="********@163.com"   #用户名
@@ -21,6 +22,16 @@ nowtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 ip = commands.getstatusoutput('curl -s http://icanhazip.com/')
 wip = ip[1].split(' ')[-1]
 
+#####钉钉配置######
+url = "钉钉群机器人地址"
+title = "甄嬛传宕机报警"
+content = "监控报警"
+msg = """### 甄嬛传程序报警 \n
+> content: %s \n
+> 时间: %s \n
+> 游戏区组：%s \n
+> 状态: 重启 \n
+"""
 
 
 
@@ -30,7 +41,19 @@ def monitorlog(string):
     f = open( '%s/%s.log' % (logpath,filename),'a')
     f.write('%s : %s : %s : %s\n' % (nowtime,filename,wip,string))
     f.close()
-
+    
+def dingtalk(quzu):
+    headers = {"Content-Type": "application/json"}
+    data = {"msgtype": "markdown",
+        "markdown": {
+            "title": title,
+            "text":  msg %(content,nowtime,quzu)
+        }
+    }
+    r = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+    print(r.text)
+    
+    
 def send_mail(content):
     #messagelog = "%s Host  %s:%s connection failure \n" % (strtime, host[0], host[1])
     message = MIMEText (content, 'plain', 'utf-8')
@@ -74,6 +97,7 @@ def  monitor():
                         outfiles = commands.getstatusoutput(processs)
                         monitorlog('%s : %s : %s is restart complete, please checkout gameserverlog !!!' % (nowtime,wip,x))
                         send_mail('%s : %s : %s is restarting' % (nowtime,wip,x))
+                        dingtalk(x)
  
 if __name__ == "__main__":
     monitor()
