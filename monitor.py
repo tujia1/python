@@ -94,7 +94,7 @@ def  monitor():
                 process = commandformat % (y)
                 outfile = commands.getstatusoutput(process)
                 if outfile[1] == '1':
-                    monitorlog('%s : %s : %s is running' % (nowtime,wip,x))
+                    monitorlog('%s is running' % (x))
                 else:
                     commandformatd = 'sudo -i -u %s /home/zhz/update/shutdown.sh gameserver '
                     commandformats = 'sudo -i -u %s /home/zhz/update/boot.sh gameserver'
