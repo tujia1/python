@@ -76,28 +76,35 @@ def send_mail(content):
         pass
 
 def  monitor():
-    with open("/home/zhz/update/user.txt") as f:
-        for line in f:
-            args = line.split(":")
-            number = dict(username = args[0])
-            number2 = dict(uid = args[2])
-            for x in number.values():
-                for y in number2.values():
-                    commandformat = 'ps aux |  grep -v root | grep  -w %s | grep -w  "gameserver -c" | wc -l'
-                    process = commandformat % (y)
-                    outfile = commands.getstatusoutput(process)
-                    if outfile[1] == '1':
-                        monitorlog('%s : %s : %s is running' % (nowtime,wip,x))
-                    else:
-                        commandformatd = 'sudo -i -u %s /home/zhz/update/shutdown.sh gameserver '
-                        commandformats = 'sudo -i -u %s /home/zhz/update/boot.sh gameserver'
-                        processd = commandformatd % (x)
-                        outfiled = commands.getstatusoutput(processd)
-                        processs = commandformats % (x) 
-                        outfiles = commands.getstatusoutput(processs)
-                        monitorlog('%s : %s : %s is restart complete, please checkout gameserverlog !!!' % (nowtime,wip,x))
-                        send_mail('%s : %s : %s is restarting' % (nowtime,wip,x))
-                        dingtalk(x)
+   with open('/etc/passwd', 'r') as f:
+      with open('output.txt', 'w') as out_file:
+         for line in f:
+            if line.startswith('server'):
+               args = line.strip().split("::")[0]
+               out_file.write(args + '\n')
+
+   with open('output.txt', 'r') as out_file:
+      for i in  out_file:
+         username, _, _, uid  = i.strip().split(":")
+         number = { 'username': username }
+         number2 = { 'uid': uid }
+         for x in number.values():
+            for y in number2.values():
+                commandformat = 'ps aux |  grep -v root | grep  -w %s | grep -w  "gameserver -c" | wc -l'
+                process = commandformat % (y)
+                outfile = commands.getstatusoutput(process)
+                if outfile[1] == '1':
+                    monitorlog('%s : %s : %s is running' % (nowtime,wip,x))
+                else:
+                    commandformatd = 'sudo -i -u %s /home/zhz/update/shutdown.sh gameserver '
+                    commandformats = 'sudo -i -u %s /home/zhz/update/boot.sh gameserver'
+                    processd = commandformatd % (x)
+                    outfiled = commands.getstatusoutput(processd)
+                    processs = commandformats % (x)
+                    outfiles = commands.getstatusoutput(processs)
+                    monitorlog('%s : %s : %s is restart complete, please checkout gameserverlog !!!' % (nowtime,wip,x))
+                    send_mail('%s : %s : %s is restarting' % (nowtime,wip,x))
+                    dingtalk(x)
  
 if __name__ == "__main__":
     monitor()
